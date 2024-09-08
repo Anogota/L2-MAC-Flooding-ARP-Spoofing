@@ -125,4 +125,83 @@ PORT     STATE SERVICE
 5002/tcp open  rfe
 ```
 
+Task 2: Which machine has an open well-known port?
+The answer is: 192.168.12.20, because that ip have http port (80)
+
+Task 3:What is the port number?
+Like i wrote above: 80
+
+Task 4:Can you access the content behind the service from your current position? (Nay/Yay)
+I check it in web browser, and that what i saw: This site is unreachable, so the answer is: nay
+
+Task 5:Can you see any meaningful traffic to or from that port passively sniffing on you interface eth1? (Nay/Yay)
+Use that command ```sudo tcpdump -vvA -i eth1``` and the answer is nay, we can't see anymeaingful.
+
+Task 6:Now launch the same ARP spoofing attack as in the previous task. Can you see some interesting traffic, now? (Nay/Yay)
+Use that command ```sudo ettercap -T -i eth1 -M arp``` we see a lot of traffic, check sample below:
+
+```
+Sun Sep  8 14:25:56 2024 [92939]
+  192.168.12.10:0 --> 192.168.12.20:0 |  (0)
+Sun Sep  8 14:25:56 2024 [93010]
+  192.168.12.20:0 --> 192.168.12.10:0 |  (0)
+Sun Sep  8 14:25:58 2024 [859412]
+TCP  192.168.12.10:4444 --> 192.168.12.20:51934 | AP (4)
+pwd
+Sun Sep  8 14:25:58 2024 [866310]
+TCP  192.168.12.20:51934 --> 192.168.12.10:4444 | FA (0)
+Sun Sep  8 14:25:58 2024 [917901]
+TCP  192.168.12.10:4444 --> 192.168.12.20:51934 | A (0)
+Sun Sep  8 14:25:59 2024 [867771]
+TCP  192.168.12.10:4444 --> 192.168.12.20:51938 | AP (4)
+pwd
+Sun Sep  8 14:25:59 2024 [874318]
+TCP  192.168.12.20:51938 --> 192.168.12.10:4444 | A (0)
+Sun Sep  8 14:25:59 2024 [874483]
+TCP  192.168.12.20:51938 --> 192.168.12.10:4444 | AP (6)
+/root
+```
+
+Task 7.Who is using that service?
+If you look at the first captured traffic, it is 192.168.12.10 initiating a conversation with 192.168.12.20. 192.168.12.10 is indeed Alice’s IP address.
+
+Task 8:What's the hostname the requests are sent to?
+If u will look down, you can find this: www.server.bob
+
+![image](https://github.com/user-attachments/assets/5192b1b0-efb3-4d09-afe2-1df5b5c1ce29)
+
+Task 8:Which file is being requested?
+Look above against the server.bob is test.txt
+
+Task 9:What text is in the file?
+The answer is: OK
+
+![image](https://github.com/user-attachments/assets/3a813410-8cc0-4bc5-ba4f-fee0611dafc9)
+
+
+Task 10:Which credentials are being used for authentication? (username:password)
+You can also find it, there: USER: admin  PASS: s3cr3t_P4zz
+
+![image](https://github.com/user-attachments/assets/6d760d2c-6693-4540-9f2a-12d91f8471f0)
+
+Task 11:Now, stop the attack (by pressing q). What is ettercap doing in order to leave its man-in-the-middle position gracefully and undo the poisoning?
+You need to stop the attack by presing q on keyboard, second-last line displayed after pressing q: RE-ARPing the victims
+
+Task 12:Can you access the content behind that service, now, using the obtained credentials? (Nay/Yay)
+The answer is: yay ```curl -u admin:s3cr3t_P4zz http://192.168.12.20/```
+
+Task 13:What is the user.txt flag?
+```curl -u admin:s3cr3t_P4zz http://192.168.12.20/user.txt``` insert that command in terminal, and you will see that: THM{wh0s_$n!ff1ng_0ur_cr3ds}
+
+Task 14:You should also have seen some  rather questionable kind of traffic. What kind of remote access (shell) does Alice have on the server?
+The answer is: reverse shell
+
+Task 15:What commands are being executed? Answer in the order they are being executed.
+If you go back to the ettercap output, you can see Alice using reverse shell to control Bob’s system by entering commands such as whoami, pwd, ls
+
+Task 16:Which of the listed files do you want?
+That how you can see, this will be a root.txt
+
+![image](https://github.com/user-attachments/assets/5bd4c843-c263-4626-8c2b-7437ea431676)
+
 
